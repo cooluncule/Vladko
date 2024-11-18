@@ -5,5 +5,6 @@ services:
     image: modenaf360/gotty:latest
     ports:
       - "8989:8080"
-    stdin_open: true  # Keeps STDIN open
-    tty: true         # Enables pseudo-TTY
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
