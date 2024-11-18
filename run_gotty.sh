@@ -1,22 +1,21 @@
 #!/bin/bash
 
-# Enhanced Gotty command for mobile interactivity
+# Check if the PORT environment variable is set (Render requires this)
+if [ -z "$PORT" ]; then
+  echo "Error: PORT environment variable is not set. Render requires this to run properly."
+  exit 1
+fi
+
+# Default Gotty command for mobile-friendly interactive mode
 GOTTY_CMD="/usr/local/bin/gotty \
   --permit-write \
   --reconnect \
   --enable-webgl \
   --enable-clipboard \
   --once \
-  --title-format 'Mobile Terminal' \
-  --width 80 \
-  --height 24 \
+  --port $PORT \
+  --title-format 'Render Terminal' \
   /bin/bash"
 
-# Start Gotty
-echo "Starting Gotty with mobile-friendly settings..."
-if $GOTTY_CMD; then
-    echo "Gotty session ended. Exiting process."
-else
-    echo "Failed to start Gotty!" >&2
-    exit 1
-fi
+echo "Starting Gotty on port $PORT..."
+exec $GOTTY_CMD
