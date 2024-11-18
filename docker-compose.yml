@@ -1,8 +1,9 @@
-my-gotty:
-  hostname: mygotty
-  ports:
-  - 8989:8080
-  tty: true
-  image: modenaf360/gotty:latest
-  stdin_open: true
-  tty: true                     #using bash TTY mode (pseudo-TTY)
+version: "3.8"
+services:
+  my-gotty:
+    hostname: mygotty
+    image: modenaf360/gotty:latest
+    ports:
+      - "8989:8080"
+    stdin_open: true  # Keeps STDIN open
+    tty: true         # Enables pseudo-TTY
