@@ -1,24 +1,21 @@
-FROM ubuntu:22.04
-LABEL maintainer="Pixel Host <wingnut0310@gmail.com>"
+# Use a base image that supports systemd, for example, Ubuntu
+FROM ubuntu:20.04
 
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV GOTTY_TAG_VER v1.0.1
-
-# Install necessary tools and Gotty
+# Install necessary packages
 RUN apt-get update && \
-    apt-get install -y curl && \
-    curl -sL https://github.com/yudai/gotty/releases/download/${GOTTY_TAG_VER}/gotty_linux_amd64.tar.gz \
-    | tar xz -C /usr/local/bin && \
+    apt-get install -y shellinabox systemd systemd-sysv && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy the startup script
-COPY run_gotty.sh /run_gotty.sh
-RUN chmod +x /run_gotty.sh
+# Set the root password (for shellinabox)
+RUN echo 'root:root' | chpasswd
 
-# Expose the Render-compliant port (8080)
-EXPOSE 8080
+# Expose the web-based terminal port
+EXPOSE 4200
 
-# Run Gotty on container start
-CMD ["/bin/bash", "/run_gotty.sh"]
+# Copy a script to initialize systemd
+COPY init.sh /usr/local/bin/init.sh
+RUN chmod +x /usr/local/bin/init.sh
+
+# Set the default command to initialize systemd and start shellinabox
+CMD ["/usr/local/bin/init.sh"]
