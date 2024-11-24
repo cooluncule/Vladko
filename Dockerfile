@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 
 # Install necessary packages
 RUN apt-get update && \
-    apt-get install -y shellinabox systemd systemd-sysv && \
+    apt-get install -y shellinabox && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -13,9 +13,5 @@ RUN echo 'root:root' | chpasswd
 # Expose the web-based terminal port
 EXPOSE 4200
 
-# Copy a script to initialize systemd
-COPY init.sh /usr/local/bin/init.sh
-RUN chmod +x /usr/local/bin/init.sh
-
-# Set the default command to initialize systemd and start shellinabox
-CMD ["/usr/local/bin/init.sh"]
+# Start shellinabox
+CMD ["/usr/bin/shellinaboxd", "-t", "-s", "/:LOGIN"]
