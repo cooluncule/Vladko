@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 
 # Install necessary packages
 RUN apt-get update && \
-    apt-get install -y shellinabox wget unzip && \
+    apt-get install -y shellinabox wget unzip dos2unix && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -57,7 +57,8 @@ ngrok config add-authtoken ${NGROK_AUTH_TOKEN}\n\
 /usr/bin/shellinaboxd -t -s /:LOGIN &\n\
 # Start ngrok to expose port 4200\n\
 ngrok http 4200 --log=stdout\n" > /usr/local/bin/start.sh && \
-    chmod +x /usr/local/bin/start.sh
+    chmod +x /usr/local/bin/start.sh && \
+    dos2unix /usr/local/bin/start.sh
 
 # Environment variable for ngrok authtoken
 ENV NGROK_AUTH_TOKEN=""
