@@ -3,9 +3,15 @@ FROM ubuntu:20.04
 
 # Install necessary packages
 RUN apt-get update && \
-    apt-get install -y shellinabox && \
+    apt-get install -y shellinabox wget unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install ngrok
+RUN wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-linux-amd64.zip && \
+    unzip ngrok-stable-linux-amd64.zip && \
+    mv ngrok /usr/local/bin/ && \
+    rm ngrok-stable-linux-amd64.zip
 
 # Set the root password (for shellinabox)
 RUN echo 'root:root' | chpasswd
@@ -37,5 +43,24 @@ Enjoy exploring your Linux environment!\n\
 # Expose the web-based terminal port
 EXPOSE 4200
 
-# Start shellinabox
-CMD ["/usr/bin/shellinaboxd", "-t", "-s", "/:LOGIN"]
+# Add a script to run shellinabox and ngrok
+RUN echo -e "\
+#!/bin/bash\n\
+# Ensure ngrok authtoken is set\n\
+if [ -z \"${NGROK_AUTH_TOKEN}\" ]; then\n\
+  echo \"Error: NGROK_AUTH_TOKEN is not set. Exiting.\"\n\
+  exit 1\n\
+fi\n\
+# Configure ngrok with the provided authtoken\n\
+ngrok config add-authtoken ${NGROK_AUTH_TOKEN}\n\
+# Start shellinabox\n\
+/usr/bin/shellinaboxd -t -s /:LOGIN &\n\
+# Start ngrok to expose port 4200\n\
+ngrok http 4200 --log=stdout\n" > /usr/local/bin/start.sh && \
+    chmod +x /usr/local/bin/start.sh
+
+# Environment variable for ngrok authtoken
+ENV NGROK_AUTH_TOKEN=""
+
+# Start shellinabox and ngrok
+CMD ["/usr/local/bin/start.sh"]
